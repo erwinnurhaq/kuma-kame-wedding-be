@@ -2,7 +2,13 @@ export const APP_CONFIG = {
   PORT: process.env.PORT || 3000,
   ENV: process.env.NODE_ENV || 'development',
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*', // Adjust in production
+  WAHA_URL: process.env.WAHA_URL || '',
+  WAHA_API_KEY: process.env.WAHA_API_KEY || '',
+  WAHA_SESSION: process.env.WAHA_SESSION || 'default',
+  WAHA_TARGET_ID: process.env.WAHA_TARGET_ID || '',
 } as const;
+
+console.log(APP_CONFIG);
 
 export const PAGINATION_CONFIG = {
   DEFAULT_PAGE: 1,

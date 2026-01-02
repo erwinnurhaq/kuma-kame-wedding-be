@@ -1,0 +1,19 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kuma-kame-wedding-be
+    ports:
+      - 5002:3000
+    env_file:
+      - .env
+    volumes:
+      - ./build/db:/app/db
+    restart: unless-stopped
+    networks:
+      - shared-net
+networks:
+  shared-net:
+    external: true
+    name: waha-shared-network

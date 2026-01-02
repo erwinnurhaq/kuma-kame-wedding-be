@@ -1,8 +1,17 @@
 import { Database } from 'bun:sqlite';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import fs from 'fs';
 import type { Attendance, AttendanceDTO, AttendancePaginationParams } from './types';
 
-export const db = new Database(join(process.cwd(), `database.sqlite`), { create: true, strict: true });
+const dbPath = join(process.cwd(), `db`, `database.sqlite`);
+console.log('> DB Path: ', dbPath);
+
+const dir = dirname(dbPath);
+if (!fs.existsSync(dir)) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+export const db = new Database(dbPath, { create: true, strict: true });
 
 // Initialize database
 export const initDb = () => {

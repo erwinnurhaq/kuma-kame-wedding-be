@@ -5,6 +5,7 @@ import { logger } from './logger';
 import { attendanceDb, db } from './database';
 import { ipGetter } from './middleware';
 import { attendanceDTO, attendancePaginationParams, attendanceSortOrderParams, type Attendance } from './types';
+import { sendAttendanceWhatsAppNotification } from './waha';
 
 export const api = new Elysia({
   name: 'main-app',
@@ -141,6 +142,8 @@ export const api = new Elysia({
           name: created.name,
           attendance: created.attendance,
         });
+
+        sendAttendanceWhatsAppNotification(created);
 
         set.status = 201; // Created
         return {
