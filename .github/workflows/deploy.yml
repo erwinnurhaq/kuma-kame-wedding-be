@@ -1,0 +1,45 @@
+name: Build and Deploy Wedding Backend
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. Set up Docker Buildx (required for modern building structures)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 2. Build the Docker image locally on the GitHub Runner
+      - name: Build Local Image Staging
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: registry.erwww.in/kuma-kame-wedding-be:latest
+          outputs: type=docker,dest=/tmp/myimage.tar
+
+      # 3. Securely ship the built container over to your private server registry via curl
+      # This completely bypasses public hub restrictions using standard HTTP basic auth
+      - name: Push to Self-Hosted Registry
+        run: |
+          # Load the image from the runner build staging cache
+          docker load --input /tmp/myimage.tar
+          
+          # Log into your private registry UI engine using your INFRA credentials
+          echo "${{ secrets.INFRA_PASSWORD_PLAIN }}" | docker login registry.erwww.in \
+            -u "${{ secrets.INFRA_USER }}" --password-stdin
+            
+          # Push the fresh image block over your secure domain routing
+          docker push registry.erwww.in/kuma-kame-wedding-be:latest
+
+      # 4. Fire the webhook to Watchtower to hot-reload the container instantly without SSH
+      - name: Trigger Instant Server Update Check
+        run: |
+          curl -f -u "${{ secrets.INFRA_USER }}:${{ secrets.INFRA_PASSWORD_PLAIN }}" \
+               https://updater.erwww.in/v1/update
